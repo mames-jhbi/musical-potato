@@ -6,5 +6,6 @@ __pycache__/
 .venv/
 submissions/
 submission.csv
+output/*/.git
 leaderboard.csv
 leaderboard.md
