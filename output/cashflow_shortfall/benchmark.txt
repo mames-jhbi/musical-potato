@@ -1,0 +1,24 @@
+--- Cash Flow Shortfall Benchmark ---
+Train/Eval split: 70/30
+Shortfall rate: 25.0%
+
+Regression (cashflow_shortfall_amount):
+  Linear Regression:
+    RMSE: $14,154.80
+    MAE:  $11,348.88
+    R2:   0.3371
+
+  RF Regressor (n=100):
+    RMSE: $14,431.35
+    MAE:  $11,569.33
+    R2:   0.3110
+
+Classification (shortfall_flag):
+  Logistic Regression:
+    AUC-ROC: 0.7841
+    F1:      0.4180
+
+  RF Classifier (n=100):
+    AUC-ROC: 0.7650
+    F1:      0.3887
+

@@ -1,0 +1,14 @@
+--- Fraud Detection Benchmark ---
+Train/Eval split: 70/30
+Fraud rate: 4.4%
+
+Logistic Regression:
+  AUC-PR:        0.1126
+  F1:            0.0000
+  Recall@5%FPR:  0.2080
+
+Random Forest (n=100):
+  AUC-PR:        0.4781
+  F1:            0.3730
+  Recall@5%FPR:  0.5361
+
