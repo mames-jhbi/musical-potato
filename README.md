@@ -11,6 +11,7 @@ Three independent data science challenges designed around realistic synthetic ba
 | 1 | [Product Recommendation](output/product_recommendation/) | Classification + Ranking | AUC-ROC, Precision@K, MAP@K | 250k customers |
 | 2 | [Fraud Detection](output/fraud_detection/) | Imbalanced Classification | AUC-PR, F1, Recall@5% FPR | 500k transactions |
 | 3 | [Cash Flow Shortfall](output/cashflow_shortfall/) | Regression + Classification | RMSE, MAE, R-squared, AUC-ROC | 200k businesses |
+| 4 | [Loan Default](output/loan_default/) | Regression + Classification | RMSE, R², AUC-ROC, F1 | 180k loans |
 
 ---
 
@@ -68,7 +69,7 @@ scikit-learn
 
 ```bash
 # Look at the challenge you want to tackle
-cd output/product_recommendation/   # or fraud_detection/ or cashflow_shortfall/
+cd output/product_recommendation/   # or fraud_detection/, cashflow_shortfall/, loan_default/
 
 # Read the challenge README for full details
 cat README.md
@@ -99,5 +100,6 @@ Detailed instructions, data dictionaries, evaluation criteria, and submission fo
 - **[Challenge 1: Product Recommendation](output/product_recommendation/README.md)**
 - **[Challenge 2: Fraud Detection](output/fraud_detection/README.md)**
 - **[Challenge 3: Cash Flow Shortfall](output/cashflow_shortfall/README.md)**
+- **[Challenge 4: Loan Default](output/loan_default/README.md)**
 
 Good luck!

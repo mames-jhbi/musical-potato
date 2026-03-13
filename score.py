@@ -11,6 +11,7 @@ Expected layout:
             product_recommendation.csv   → customer_id, adoption_probability
             fraud_detection.csv          → transaction_id, fraud_probability
             cashflow_shortfall.csv       → business_id, predicted_shortfall_amount, predicted_shortfall_flag
+            loan_default.csv             → loan_id, predicted_days_to_default, predicted_default_flag
         team_beta/
             ...
 
@@ -53,6 +54,10 @@ CHALLENGES = {
     "cashflow_shortfall": {
         "answer_key": OUTPUT_DIR / "cashflow_shortfall" / "answer_key.csv",
         "id_col": "business_id",
+    },
+    "loan_default": {
+        "answer_key": OUTPUT_DIR / "loan_default" / "answer_key.csv",
+        "id_col": "loan_id",
     },
 }
 
@@ -203,10 +208,49 @@ def score_cashflow_shortfall(sub: pd.DataFrame) -> dict:
     }
 
 
+def score_loan_default(sub: pd.DataFrame) -> dict:
+    challenge = "loan_default"
+    id_col = "loan_id"
+    days_col = "predicted_days_to_default"
+    flag_col = "predicted_default_flag"
+
+    errors = _validate_submission(sub, challenge, [id_col, days_col, flag_col])
+    if errors:
+        return {"_errors": errors}
+
+    ak = _load_answer_key(challenge)
+    merged = sub.merge(ak, on=id_col, how="inner")
+
+    y_true_reg = merged["days_to_early_default"].values
+    y_pred_reg = merged[days_col].values.astype(float)
+
+    rmse = np.sqrt(mean_squared_error(y_true_reg, y_pred_reg))
+    mae = mean_absolute_error(y_true_reg, y_pred_reg)
+    r2 = r2_score(y_true_reg, y_pred_reg)
+
+    y_true_cls = merged["default_flag"].values
+    y_pred_cls = merged[flag_col].values.astype(int)
+
+    try:
+        cls_auc = roc_auc_score(y_true_cls, y_pred_cls)
+    except ValueError:
+        cls_auc = 0.0
+    cls_f1 = f1_score(y_true_cls, y_pred_cls)
+
+    return {
+        "RMSE": round(rmse, 2),
+        "MAE": round(mae, 2),
+        "R²": round(r2, 4),
+        "AUC-ROC": round(cls_auc, 4),
+        "F1": round(cls_f1, 4),
+    }
+
+
 SCORERS = {
     "product_recommendation": score_product_recommendation,
     "fraud_detection": score_fraud_detection,
     "cashflow_shortfall": score_cashflow_shortfall,
+    "loan_default": score_loan_default,
 }
 
 # ── Composite score (for ranking) ──────────────────────────────────────────
@@ -216,17 +260,17 @@ PRIMARY_METRICS = {
     "product_recommendation": ("AUC-ROC", "higher"),
     "fraud_detection": ("AUC-PR", "higher"),
     "cashflow_shortfall": ("R²", "higher"),
+    "loan_default": ("R²", "higher"),
 }
 
 
 def composite_score(team_results: dict) -> float | None:
-    """Weighted average of normalized primary metrics. Returns None if any challenge missing."""
+    """Average of primary metrics over challenges with valid submissions."""
     scores = []
     for challenge, (metric, _) in PRIMARY_METRICS.items():
-        if challenge not in team_results or "_errors" in team_results[challenge]:
-            return None
-        scores.append(team_results[challenge].get(metric, 0.0))
-    return round(np.mean(scores), 4)
+        if challenge in team_results and "_errors" not in team_results[challenge]:
+            scores.append(team_results[challenge].get(metric, 0.0))
+    return round(np.mean(scores), 4) if scores else None
 
 
 # ── Batch processing ───────────────────────────────────────────────────────
@@ -274,6 +318,11 @@ FLAT_COLUMNS = [
     ("cashflow_shortfall", "R²"),
     ("cashflow_shortfall", "AUC-ROC"),
     ("cashflow_shortfall", "F1"),
+    ("loan_default", "RMSE"),
+    ("loan_default", "MAE"),
+    ("loan_default", "R²"),
+    ("loan_default", "AUC-ROC"),
+    ("loan_default", "F1"),
 ]
 
 
@@ -282,6 +331,7 @@ def _metric_display(challenge: str, metric: str) -> str:
         "product_recommendation": "PR",
         "fraud_detection": "FD",
         "cashflow_shortfall": "CF",
+        "loan_default": "LD",
     }
     return f"{prefix[challenge]}_{metric}"
 

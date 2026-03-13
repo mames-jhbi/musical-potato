@@ -1,0 +1,24 @@
+--- Loan Default Benchmark ---
+Train/Eval split: 70/30
+Default rate: 18.0%
+
+Regression (days_to_early_default):
+  Linear Regression:
+    RMSE: 167.6 days
+    MAE:  126.5 days
+    R2:   0.2082
+
+  RF Regressor (n=100):
+    RMSE: 167.3 days
+    MAE:  112.9 days
+    R2:   0.2112
+
+Classification (default_flag):
+  Logistic Regression:
+    AUC-ROC: 0.8248
+    F1:      0.3892
+
+  RF Classifier (n=100):
+    AUC-ROC: 0.8036
+    F1:      0.3473
+

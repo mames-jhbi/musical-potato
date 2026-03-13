@@ -436,3 +436,63 @@ def write_cashflow_benchmark(results, output_path, shortfall_rate):
             f.write(f"    AUC-ROC: {m['AUC-ROC']:.4f}\n")
             f.write(f"    F1:      {m['F1']:.4f}\n\n")
     print(f"  Benchmark written to {path}")
+
+
+def benchmark_loan_default(X_train_reg, y_train_reg, X_eval_reg, y_eval_reg,
+                            X_train_cls, y_train_cls, X_eval_cls, y_eval_cls):
+    """Regression: RMSE/MAE/R2 on days_to_default.  Classification: AUC/F1 on default_flag."""
+    y_eval_reg = np.asarray(y_eval_reg)
+    y_eval_cls = np.asarray(y_eval_cls)
+    results = {"regression": {}, "classification": {}}
+
+    for name, model in [
+        ("Linear Regression", LinearRegression()),
+        ("RF Regressor (n=100)",
+         RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)),
+    ]:
+        model, _, Xev = _fit_and_predict(model, X_train_reg, y_train_reg,
+                                         X_eval_reg)
+        y_pred = model.predict(Xev)
+        results["regression"][name] = {
+            "RMSE": np.sqrt(mean_squared_error(y_eval_reg, y_pred)),
+            "MAE": mean_absolute_error(y_eval_reg, y_pred),
+            "R2": r2_score(y_eval_reg, y_pred),
+        }
+
+    for name, model in [
+        ("Logistic Regression",
+         LogisticRegression(max_iter=1000, random_state=42)),
+        ("RF Classifier (n=100)",
+         RandomForestClassifier(n_estimators=100, random_state=42,
+                                n_jobs=-1)),
+    ]:
+        model, _, Xev = _fit_and_predict(model, X_train_cls, y_train_cls,
+                                         X_eval_cls)
+        y_prob = model.predict_proba(Xev)[:, 1]
+        y_pred = model.predict(Xev)
+        results["classification"][name] = {
+            "AUC-ROC": roc_auc_score(y_eval_cls, y_prob),
+            "F1": f1_score(y_eval_cls, y_pred),
+        }
+
+    return results
+
+
+def write_loan_default_benchmark(results, output_path, default_rate):
+    path = os.path.join(output_path, "benchmark.txt")
+    with open(path, "w") as f:
+        f.write("--- Loan Default Benchmark ---\n")
+        f.write("Train/Eval split: 70/30\n")
+        f.write(f"Default rate: {default_rate:.1%}\n\n")
+        f.write("Regression (days_to_early_default):\n")
+        for name, m in results["regression"].items():
+            f.write(f"  {name}:\n")
+            f.write(f"    RMSE: {m['RMSE']:.1f} days\n")
+            f.write(f"    MAE:  {m['MAE']:.1f} days\n")
+            f.write(f"    R2:   {m['R2']:.4f}\n\n")
+        f.write("Classification (default_flag):\n")
+        for name, m in results["classification"].items():
+            f.write(f"  {name}:\n")
+            f.write(f"    AUC-ROC: {m['AUC-ROC']:.4f}\n")
+            f.write(f"    F1:      {m['F1']:.4f}\n\n")
+    print(f"  Benchmark written to {path}")
