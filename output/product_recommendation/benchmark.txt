@@ -10,9 +10,9 @@ Logistic Regression:
   MAP@1000:       0.9640
 
 Random Forest (n=100):
-  AUC-ROC:        0.9443
-  Precision@100:  0.9600
-  Precision@500:  0.9600
-  Precision@1000: 0.9640
-  MAP@1000:       0.9652
+  AUC-ROC:        0.9442
+  Precision@100:  0.9500
+  Precision@500:  0.9560
+  Precision@1000: 0.9590
+  MAP@1000:       0.9519
 

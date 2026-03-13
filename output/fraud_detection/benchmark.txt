@@ -8,7 +8,7 @@ Logistic Regression:
   Recall@5%FPR:  0.2080
 
 Random Forest (n=100):
-  AUC-PR:        0.4781
-  F1:            0.3730
-  Recall@5%FPR:  0.5361
+  AUC-PR:        0.4782
+  F1:            0.3738
+  Recall@5%FPR:  0.5365
 

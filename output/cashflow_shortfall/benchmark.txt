@@ -9,8 +9,8 @@ Regression (cashflow_shortfall_amount):
     R2:   0.3371
 
   RF Regressor (n=100):
-    RMSE: $14,431.35
-    MAE:  $11,569.33
+    RMSE: $14,430.56
+    MAE:  $11,568.23
     R2:   0.3110
 
 Classification (shortfall_flag):
@@ -19,6 +19,6 @@ Classification (shortfall_flag):
     F1:      0.4180
 
   RF Classifier (n=100):
-    AUC-ROC: 0.7650
-    F1:      0.3887
+    AUC-ROC: 0.7651
+    F1:      0.3886
 

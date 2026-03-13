@@ -3,3 +3,8 @@ __pycache__/
 *.pyo
 .DS_Store
 .cursor/
+.venv/
+submissions/
+submission.csv
+leaderboard.csv
+leaderboard.md
